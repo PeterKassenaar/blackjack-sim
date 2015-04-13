@@ -1,6 +1,9 @@
-BlackJack
+blackjack-sim
 =========
 
-Javascript (some jQuery) BlackJack game.
+Javascript BlackJack simulator. Work in Progress.
 
-Started in this fiddle: http://jsfiddle.net/scottux/HtZu6/
+Eventually it's becoming (hopefully) a full featured and configurable blackjack risk-calculator, to be used in various casinos. 
+
+Forked from https://github.com/scottux/BlackJack for its nice & clean Card(), Deck() and Hand() functions.
+ 
