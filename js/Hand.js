@@ -2,13 +2,22 @@
  * Created by Peter Kassenaar on 14-4-2015.
  */
 /** @constructor */
-var Hand = function (deck, numCards) {
+var Hand = function (deck, numCards, value, splitHandCard) {
 	var cards = [];
+	var betSize = value ? value : 0;
 
-	/* Deal one or two cards to begin. */
-	numCards === 1
-		? cards.push(deck.deal())        // PK: one card for de the dealer
-		: cards.push(deck.deal(), deck.deal()); // PK: two cards for the player
+	if (splitHandCard) {
+		/** Hand is based on split of a previous hand.
+		 *  Create a new hand with the existing card and
+		 *  deal one new card */
+		cards.push(splitHandCard);
+		cards.push(deck.deal());
+	} else {
+		/* New Hand. Deal one or two cards to begin. */
+		numCards === 1
+			? cards.push(deck.deal())        		// one card for de the dealer
+			: cards.push(deck.deal(), deck.deal()); // two cards for the player
+	}
 	/** @returns {Array} The array of Cards representing the Hand. */
 	this.getHand = function () {
 		return cards;
@@ -34,6 +43,26 @@ var Hand = function (deck, numCards) {
 		}
 		return score;
 	};
+
+	/** Getter and setter for size of bet for this hand
+	 *
+	 * @param value The value to set for the betsize.
+	 * @returns {number} The betsize for this hand
+	 */
+	this.betSize = function (value) {
+		if (value) {
+			betSize = value;
+		} else {
+			return betSize;
+		}
+
+	};
+
+	/** Doubles the bet size for this hand. */
+	this.double = function () {
+		betSize *= 2;
+	};
+
 	/** @returns {String} Comma separated list of Card names in the Hand. */
 	this.printHand = function () {
 		var arrayOut = [],
