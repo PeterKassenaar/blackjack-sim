@@ -15,6 +15,8 @@
  * @param goal
  * @param goalReached
  * @param handsPlayed
+ * @param maxWinningStreak
+ * @param maxLosingStreak
  * @param maxPlayerAmount
  * @param minPlayerAmount
  * @param endPlayerAmount
@@ -23,6 +25,7 @@
 var Session = function (maxNumhands, bankroll, betSize, wins, losses,
 						playerBlackjacks, dealerBlackjacks, splitHands, bankrupt,
 						goal, goalReached, handsPlayed,
+						maxWinningStreak, maxLosingStreak,
 						maxPlayerAmount, minPlayerAmount, endPlayerAmount) {
 	this.maxNumhands = maxNumhands;
 	this.bankroll = bankroll;
@@ -40,6 +43,8 @@ var Session = function (maxNumhands, bankroll, betSize, wins, losses,
 	this.goal = goal;
 	this.goalReached = goalReached;
 	this.handsPlayed = handsPlayed;
+	this.maxWinningStreak = maxWinningStreak;
+	this.maxLosingStreak = maxLosingStreak;
 	this.maxPlayerAmount = maxPlayerAmount;
 	this.minPlayerAmount = minPlayerAmount;
 	this.endPlayerAmount = endPlayerAmount;

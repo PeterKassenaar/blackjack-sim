@@ -11,6 +11,7 @@ var BlackJack = (function ($) {
 	/* Input for the various simulations */
 	var numSessions = 30;		 	// TODO: Make numSessions dynamic
 	var numHands = 100;				// TODO: make dynamic
+	var numDecks = 6;
 	var winPercentageGoal = 20; 	// TODO: Make winPercentageGoal dynamic
 	var playerAmount = 1000; 		// TODO: make playerAmount dynamic
 	var betSize = 50;				// TODO: make betSize dynamic
@@ -40,13 +41,16 @@ var BlackJack = (function ($) {
 	var winPercentage = 0;
 	var losePercentage = 0;
 	var sessions = [];
+	var currentStreak = 0;
+	var maxWinningStreak = 0;
+	var currentWinningStreak = 0;
+	var maxLosingStreak = 0;
+	var currentLosingStreak = 0;
 
 	/* playerAmount & bets */
-	//var playerAmount = 1000; // TODO: make playerAmount dynamic
 	var playerStartAmount = playerAmount;
 	var minPlayerAmount = playerAmount;
 	var maxPlayerAmount = playerAmount;
-	//var betSize = 50;	// TODO: make betSize dynamic
 	var units = playerAmount / betSize;
 	var handsPlayed = 0;
 	var isSplitted = false;
@@ -56,7 +60,7 @@ var BlackJack = (function ($) {
 	/********************/
 	/* Re-initialize the game */
 	var init = function () {
-		deck = new Deck($('#numDecks').val() || 6); // find the requested number of decks. Default: six decks
+		deck = new Deck(numDecks); // find the requested number of decks. Default: six decks
 		wins = 0;
 		losses = 0;
 		ties = 0;
@@ -72,16 +76,21 @@ var BlackJack = (function ($) {
 		numSplitHands = 0;
 		winPercentage = 0;
 		losePercentage = 0;
+		currentWinningStreak = 0;
+		currentLosingStreak = 0;
+		maxWinningStreak = 0;
+		maxLosingStreak = 0;
+
 		/* Make sure to shuffle at the start of the game. */
 		deck.shuffle();
 	};
 	init();
 
 	/** Reset sessions-array and stats */
-	var resetSessions = function () {
+	function resetSessions () {
 		sessions = [];
 		numSessions = 30; // TODO read numSessions dynamically
-	};
+	}
 
 	/** Check if player or dealer has blackjack (==21 w/ only two cards)
 	 * @Returns {bool} true if the hand is a blackjack, false if not.
@@ -124,6 +133,31 @@ var BlackJack = (function ($) {
 		return hand.getHand().length === 2;
 	};
 
+	/** Set statistics for winning/losing streak
+	 *  @param outcome {string} 'W' for winning hand, 'L' for losing hand
+	 */
+	var setStreak = function (outcome) {
+		if (outcome === 'W') {
+			// 1. Hand won
+			if (currentLosingStreak > 0) {
+				currentLosingStreak = 0;
+			}
+			currentWinningStreak += 1;
+			if (maxWinningStreak < currentWinningStreak) {
+				maxWinningStreak = currentWinningStreak;
+			}
+		} else if (outcome === 'L') {
+			// 2 .Hand Lost
+			if (currentWinningStreak > 0) {
+				currentWinningStreak = 0;
+			}
+			currentLosingStreak += 1;
+			if (maxLosingStreak < currentLosingStreak) {
+				maxLosingStreak = currentLosingStreak;
+			}
+		}
+	};
+
 	/** stand a hand. Called from AutoPlay
 	 *
 	 */
@@ -162,38 +196,42 @@ var BlackJack = (function ($) {
 			/* I didn't make the rules, I just enforce them. */
 			if (userHasBlackjack && !dealerHasBlackjack) {
 				outcome = "You win: Blackjack!";
-				wins++;
-				playerBlackjacks++;
+				wins += 1;
+				playerBlackjacks += 1;
 				playerAmount += 1.5 * yourHand.betSize();
+				setStreak('W');
 			} else if (dealerHasBlackjack && !userHasBlackjack) {
 				outcome = "You lose: dealer has blackjack!";
-				losses++;
-				dealerBlackjacks++;
+				losses += 1;
+				dealerBlackjacks += 1;
 				playerAmount -= yourHand.betSize();
+				setStreak('L');
 			} else if (dealerHasBlackjack && userHasBlackjack) {
 				outcome = "Tie: you both have blackjack!";
-				ties++;
-				dealerBlackjacks++;
-				playerBlackjacks++;
+				ties += 1;
+				dealerBlackjacks += 1;
+				playerBlackjacks += 1;
 			}
 			else if (userScore > 21 || dealerScore === 21) {
 				outcome = "You lose!";
-				losses++;
+				losses += 1;
 				playerAmount -= yourHand.betSize();
+				setStreak('L');
 			} else if (dealerScore > 21 || userScore === 21 || userScore > dealerScore) {
 				outcome = "You win!";
-				wins++;
+				wins += 1;
 				playerAmount += yourHand.betSize();
+				setStreak('W');
 			} else if (dealerScore > userScore) {
 				outcome = "You lose!";
-				losses++;
+				losses += 1;
 				playerAmount -= yourHand.betSize();
+				setStreak('L');
 			} else if (dealerScore === userScore) {
 				outcome = "You tied!";
-				ties++;
+				ties += 1;
 			}
 			result += outcome + "<br />Dealer: " + dealerHand.score() + "<br />You: " + userScore;
-			/* Output the result of the round. */
 		}
 		// record stats and return resul
 		hands = []; // reset hands.
@@ -203,7 +241,7 @@ var BlackJack = (function ($) {
 		if (playerAmount < minPlayerAmount) {
 			minPlayerAmount = playerAmount;
 		}
-		handsPlayed++;
+		handsPlayed += 1;
 		return result;
 	};
 
@@ -379,12 +417,9 @@ var BlackJack = (function ($) {
 		}
 	};
 
-
-
 	/********************/
 	/* event handlers */
 	/********************/
-
 
 	/* Auto Play button */
 	$autoPlayButton.on('click', function () {
@@ -392,10 +427,10 @@ var BlackJack = (function ($) {
 		console.time('session');
 		console.log('session started. Simulating...');
 
-
 		//*********
 		// Play Sessions
 		//*********
+		resetSessions();
 		for (var k = 0; k < numSessions; k++) {
 			console.log('***Currently playing: session #', k);
 			init();
@@ -436,12 +471,15 @@ var BlackJack = (function ($) {
 			console.log('max player amount: ', maxPlayerAmount);
 			console.log('min player amount: ', minPlayerAmount);
 			console.log('current player amount: ', playerAmount);
+			console.log('max Winning Streak: ', maxWinningStreak);
+			console.log('max Losing Streak: ', maxLosingStreak);
 			console.groupEnd('Amount');
 			console.timeEnd('session');
 			// Store session in object
 			var currentSession = new Session(numHands, playerStartAmount, betSize, wins, losses,
 				playerBlackjacks, dealerBlackjacks, numSplitHands,
 				(playerAmount <= 0), winPercentageGoal, "unclear", handsPlayed,
+				maxWinningStreak,maxLosingStreak,
 				maxPlayerAmount, minPlayerAmount, playerAmount);
 			// store played session in array
 			sessions.push(currentSession);
