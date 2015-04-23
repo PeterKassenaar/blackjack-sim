@@ -31,7 +31,7 @@ var Hand = function (deck, numCards, value, splitHandCard) {
 
 		for (i = 0; i < cards.length; i++) {
 			cardVal = cards[i].getValue();
-			if (cardVal == 11) {
+			if (cardVal === 11) {
 				aces += 1;
 			}
 			score += cardVal;
@@ -42,6 +42,35 @@ var Hand = function (deck, numCards, value, splitHandCard) {
 			aces -= 1;
 		}
 		return score;
+	};
+
+	this.isPairOfAces = function () {
+		if (cards.length === 2) {
+			return (cards[0].getValue() === 11) && (cards[1].getValue() === 11);
+		}
+		return false;
+	};
+
+	/** Check if this hand is considered a soft hand (i.e. it contains an
+	 * ace that is counted as 11.
+	 * @returns {boolean} true if hand is soft hand. False if not.
+	 */
+	this.isSoftHand = function () {
+		var i,
+			score = 0,
+			cardVal = 0, // Stashing the Card's value
+			aces = 0; // Stores the # of Aces in the Hand
+
+		for (i = 0; i < cards.length; i++) {
+			cardVal = cards[i].getValue();
+			if (cardVal === 11) {
+				aces += 1;
+			}
+			score += cardVal;
+		}
+		/* if there is one (or more) ace, and the score is
+		 * still below 21, it is a soft hand */
+		return (score < 21 && aces > 0) ;
 	};
 
 	/** Getter and setter for size of bet for this hand

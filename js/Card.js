@@ -3,14 +3,22 @@
  */
 /** @constructor */
 var Card = function (suit, number) {
+	this.suit = suit;
+	this.number = number;
+};
+/** Adapted for JavaScript prototype pattern (22-04-2015)
+ *
+ * @type {{getNumber: Function, getSuit: Function, getSymbol: Function, getValue: Function, getName: Function}}
+ */
+Card.prototype = {
 	/** @returns {Number} The number of the card in the deck. (1-52) */
-	this.getNumber = function () {
-		return number;
-	};
+	getNumber: function () {
+		return this.number;
+	},
 	/** @returns {String} The name of the suit. "Hearts","Clubs","Spades", or "Diamonds." */
-	this.getSuit = function () {
+	getSuit  : function () {
 		var suitName = '';
-		switch (suit) {
+		switch (this.suit) {
 			case 1:
 				suitName = "Hearts";
 				break;
@@ -25,11 +33,11 @@ var Card = function (suit, number) {
 				break;
 		}
 		return suitName;
-	};
+	},
 	/** @returns {String} The HTML-encoded symbol of the suit. */
-	this.getSymbol = function () {
+	getSymbol: function () {
 		var suitName = '';
-		switch (suit) {
+		switch (this.suit) {
 			case 1:
 				suitName = "&hearts;";
 				break;
@@ -44,22 +52,22 @@ var Card = function (suit, number) {
 				break;
 		}
 		return suitName;
-	};
+	},
 	/** @returns {Number} The value of the card for scoring. */
-	this.getValue = function () {
-		var value = number;
-		if (number >= 10) {
+	getValue : function () {
+		var value = this.number;
+		if (this.number >= 10) {
 			value = 10;
 		}
-		if (number === 1) {
+		if (this.number === 1) {
 			value = 11;
 		}
 		return value;
-	};
+	},
 	/** @returns {String} The full name of the card. "Ace of Spades" */
-	this.getName = function () {
+	getName  : function () {
 		var cardName = '';
-		switch (number) {
+		switch (this.number) {
 			case 1:
 				cardName = "A";
 				break;
@@ -73,9 +81,9 @@ var Card = function (suit, number) {
 				cardName = "J";
 				break;
 			default:
-				cardName = number;
+				cardName = this.number;
 				break;
 		}
 		return cardName + this.getSymbol();
-	};
+	}
 };

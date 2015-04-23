@@ -9,10 +9,11 @@ var BlackJack = (function ($) {
 	/* initialization & variables */
 	/********************/
 	/* Input for the various simulations */
-	var numSessions = 30; // TODO: Make numSessions dynamic
-	var winPercentageGoal = 100; // TODO: Make winPercentageGoal dynamic
-	var playerAmount = 1000; // TODO: make playerAmount dynamic
-	var betSize = 50;	// TODO: make betSize dynamic
+	var numSessions = 30;		 	// TODO: Make numSessions dynamic
+	var numHands = 100;				// TODO: make dynamic
+	var winPercentageGoal = 20; 	// TODO: Make winPercentageGoal dynamic
+	var playerAmount = 1000; 		// TODO: make playerAmount dynamic
+	var betSize = 50;				// TODO: make betSize dynamic
 
 	/* Set up our Game's Deck */
 	var deck;
@@ -28,18 +29,7 @@ var BlackJack = (function ($) {
 	var dealerHand;
 
 	/* CACHE SELECTORS!!! */
-	var $hitButton = $("#hitMe"),
-		$standButton = $("#stand"),
-		$doubleButton = $("#double"),
-		$dealButton = $("#deal"),
-		$resetButton = $('#reset'),
-		$autoPlayButton = $('#autoPlay'),
-		$score = $("#yourScore"),
-		$yourHand = $('#yourHand'),
-		$dealerHand = $('#dealerHand'),
-		$betSize = $('#betSize'),
-		$playerAmount = $('#playerAmount'),
-		$handsPlayed = $('#handsPlayed');
+	var $autoPlayButton = $('#autoPlay');
 
 	/* win/lose ratio and other statistics */
 	var wins = 0;
@@ -50,8 +40,6 @@ var BlackJack = (function ($) {
 	var winPercentage = 0;
 	var losePercentage = 0;
 	var sessions = [];
-	//var numSessions = 300; // TODO: Make numSessions dynamic
-	//var winPercentageGoal = 30; // TODO: Make winPercentageGoal dynamic
 
 	/* playerAmount & bets */
 	//var playerAmount = 1000; // TODO: make playerAmount dynamic
@@ -127,12 +115,6 @@ var BlackJack = (function ($) {
 		}
 		return false;
 	};
-
-	/** Double down your bet */
-	//var doubleDown = function () {
-	//	betSize *= 2;
-	//	isDoubled = true;
-	//};
 
 	/** Double down only allowed on first two cards
 	 * @returns {bool} true if doubling down is allowed
@@ -231,13 +213,11 @@ var BlackJack = (function ($) {
 		if (playerHasBlackjack && dealerHasTenOrAce) {
 			dealerHand.hitMe(); // hit once to see if dealer also gets a blackjack
 			if (checkBlackjack(dealerHand)) {
-				updateUI();
 				//console.log('dealers score: Blackjack! ');
 			}
 		} else {
 			while (dealerHand.score() < 17) { // Stand on soft 17
 				dealerHand.hitMe();
-				updateUI();
 				//console.log('dealers score: ', dealerHand.score());
 			}
 		}
@@ -252,7 +232,7 @@ var BlackJack = (function ($) {
 		hands.push(new Hand(deck, null, betSize, currentHand[1]));
 	};
 
-	/** autoPlay without any strategy.
+	/** autoPlay without (almost) any strategy.
 	 * - Hit if you're under 17 and dealer has strong upcard
 	 * - Stand if you're over 12 and dealer has weak upcard
 	 */
@@ -260,27 +240,27 @@ var BlackJack = (function ($) {
 		var dealerScore = dealerHand.score();
 		if (dealerScore >= 7) {
 			if (yourHand.score() >= 17) {
-				$standButton.trigger('click')
+				stand();
 			} else {
 				while (yourHand.score() <= 17) {
 					yourHand.hitMe();
 				}
-				$standButton.trigger('click');
+				stand();
 			}
 		}
 		else if (dealerScore < 7) {
 			if (yourHand.score() >= 12) {
-				$standButton.trigger('click')
+				stand();
 			} else {
 				while (yourHand.score() <= 12) {
 					yourHand.hitMe();
 				}
-				$standButton.trigger('click');
+				stand();
 			}
 		}
 	};
 
-	/** autoPlay with Basic strategy, without doubling or splitting
+	/** autoPlay/simulate with Basic strategy
 	 *  - uses the chart in basicStrategyChart.js
 	 */
 	var autoPlayBasicStrategy = function () {
@@ -297,7 +277,7 @@ var BlackJack = (function ($) {
 				break;
 			}
 
-			// 2. Calculate rowNumber to pick from (mapping)
+			// 2. Check if hand is a pair and can be splitted.
 			if (yourHand.getHand().length === 2 && checkPair(yourHand)) {
 				switch (yourHand.score()) {
 					case 4:
@@ -320,9 +300,13 @@ var BlackJack = (function ($) {
 						rowNumber = 29;
 						break;
 					}
-					case 12: // TODO: a pair of sixes and a pair of aces both return 12!
-					{	// 6,6
-						rowNumber = 30;
+					case 12:
+					{	// 6,6 or A,A
+						if (yourHand.isPairOfAces()) {
+							rowNumber = 35;
+						} else {
+							rowNumber = 30;
+						}
 						break;
 					}
 					case 14:
@@ -353,6 +337,13 @@ var BlackJack = (function ($) {
 				// Hard hand.
 				rowNumber = yourHand.score() - 5;
 			}
+
+			// 3. Check if hand is a soft hand and adjust row number according to Basic Strategy Table
+			if (yourHand.isSoftHand()) {
+				//console.log ('soft hand!: ', yourHand);
+				rowNumber = yourHand.score() + 4;
+			}
+
 			// 3. Pick from basic strategy chart
 			decision = strategyChart[rowNumber][colNumber];
 
@@ -388,118 +379,26 @@ var BlackJack = (function ($) {
 		}
 	};
 
-	/** Show the Deal button, hide others. */
-	var showDeal = function () {
-		$hitButton.hide();
-		$standButton.hide();
-		$doubleButton.hide();
-		$dealButton.show();
-	};
 
-	/** Show the control buttons, hide Deal. */
-	var showControls = function () {
-		$hitButton.show();
-		$standButton.show();
-		$doubleButton.show();
-		$dealButton.hide();
-	};
-
-	/** Update your score and card display. */
-	var updateUI = function () {
-		/* Cards */
-		if (yourHand) {
-			$yourHand.html(yourHand.toHtml());
-			$score.find(".digits").html(yourHand.score());
-		}
-		if (dealerHand) {
-			$dealerHand.html(dealerHand.toHtml());
-		}
-
-		/* Score */
-		$("#wins").text(wins);
-		$("#losses").text(losses);
-
-		/* Statistics */
-		$playerAmount.text(playerAmount);
-		$betSize.text(betSize);
-		$handsPlayed.text(handsPlayed);
-	};
 
 	/********************/
 	/* event handlers */
 	/********************/
-	/* Deal Button */
-	$dealButton.on('click', function () {
-		$doubleButton.show();
-		yourHand = new Hand(deck, 2, betSize); // PK: two cards for the player
-		dealerHand = new Hand(deck, 1); //PK: one card for the dealer.
-		updateUI();
-		showControls();
-	});
 
-	/* Hit Button */
-	$hitButton.on('click', function () {
-		// doubling not possible after hitting the first card
-		$doubleButton.hide();
-		yourHand.hitMe();
-		if (yourHand.score() > 21) {
-			$standButton.trigger('click');
-		} else {
-			updateUI();
-		}
-	});
-
-	/* Reset Button */
-	$resetButton.on('click', function () {
-		init();
-		showDeal();
-		updateUI();
-		deck.shuffle(); // should not be necessary here.
-	});
-
-	/** Double Button.
-	 * Double bet size and deal one more card. */
-	$doubleButton.on('click', function () {
-		doubleDown();
-		yourHand.hitMe();
-		$standButton.trigger('click');
-	});
-
-	/* Stand Button */
-	$standButton.on('click', function () {
-		// Only play dealer hand if you're not busted
-		var dealerHasToPlay = false;
-		var playerHasBlackjack = false;
-		if (isSplitted) {
-			hands.shift(); // hand was splitted. Remove first hand (w/ the pair) from hands[]
-		}
-		for (var i = 0; i < hands.length; i++) {
-			yourHand = hands[i];
-			playerHasBlackjack = (hands.length === 1 && checkBlackjack(yourHand));
-			if (playerHasBlackjack || yourHand.score() <= 21) {
-				dealerHasToPlay = true;
-				break; // if dealer has to play, break no matter what.
-			}
-		}
-		if (dealerHasToPlay) {
-			dealDealerHand(playerHasBlackjack);
-		}
-		$yourHand.html(declareWinner(hands, dealerHand));// Compare hands and declare a winner per hand
-		showDeal();
-	});
 
 	/* Auto Play button */
 	$autoPlayButton.on('click', function () {
 		console.clear();
 		console.time('session');
-		var numHands = $('#numAutoPlayHands').val();
+		console.log('session started. Simulating...');
+
 
 		//*********
 		// Play Sessions
 		//*********
 		for (var k = 0; k < numSessions; k++) {
-			$resetButton.trigger('click'); // TODO: remove dependency on buttonclick in UI
 			console.log('***Currently playing: session #', k);
+			init();
 			// *********
 			// Play Hands
 			//*********
@@ -512,8 +411,9 @@ var BlackJack = (function ($) {
 				//***************************************
 				// check if user must stand or hit. Pick a strategy by (un)commenting.
 				for (var j = 0; j < hands.length; j++) {
-					//autoPlayWithoutStrategy();
+
 					yourHand = hands[j];
+					//autoPlayWithoutStrategy();
 					autoPlayBasicStrategy();
 				}
 				stand();
@@ -560,7 +460,7 @@ var BlackJack = (function ($) {
 			}
 
 		}
-		console.log('Num bankrupts:', numBankrupts);
-		console.log('Num win percentage goals reached:', numGoalReached);
+		console.log('Num bankrupts:', numBankrupts, '(', toPercentage(numBankrupts, numSessions), '%)');
+		console.log('Num win percentage goals reached:', numGoalReached, '(', toPercentage(numGoalReached, numSessions), '%)');
 	});
 }(jQuery));
