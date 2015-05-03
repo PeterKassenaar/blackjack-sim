@@ -1,40 +1,37 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" ng-app="bjSim">
 <head>
-	<title>BlackJack</title>
-	<link rel="stylesheet" href="css/styles.css"/>
+    <title>BlackJack Simulator</title>
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+    <link rel="stylesheet" href="js/vendor/angular-material/angular-material.css"/>
+    <link href="http://fonts.googleapis.com/css?family=Roboto:400,400italic,700,500" rel="stylesheet">
+    <link rel="stylesheet" href="css/animate.css"/>
+    <link rel="stylesheet" href="css/styles.css"/>
 </head>
 <body>
-<hr/>
-<h2>Config & statistics</h2>
-<p>
-	Bet size: <strong><span id="betSize"></span></strong>
-</p>
+<div ng-view=""  class="animate"></div>
 
-<p>
-	Player Amount (bankroll): <strong><span id="playerAmount"></span></strong>
-</p>
+<!-- Vendor Scripts -->
+<script src="js/vendor/angular/angular.min.js"></script>
+<script src="js/vendor/angular-route/angular-route.min.js"></script>
+<script src="js/vendor/angular-aria/angular-aria.min.js"></script>
+<script src="js/vendor/angular-animate/angular-animate.min.js"></script>
+<script src="js/vendor/angular-material/angular-material.min.js"></script>
+<script src="js/vendor/hammerjs/hammer.min.js"></script>
 
-<p>
-	Hands Played in this session: <strong><span id="handsPlayed"></span></strong>
-</p>
-
-<p>
-	<button id="reset">Reset</button>
-</p>
-<p>
-	<label for="numAutoPlayHands">
-		<input type="number" placeholder="num hands to play..." id="numAutoPlayHands" value="100"/>
-	</label>
-	<button id="autoPlay">Auto Play hands</button>
-</p>
-<!--Scripts-->
-<script src="js/vendor/jquery/dist/jquery.min.js"></script>
+<!--Custom Scripts - blackjack logic -->
 <script src="js/Card.js"></script>
 <script src="js/Deck.js"></script>
 <script src="js/Hand.js"></script>
 <script src="js/Session.js"></script>
 <script src="js/basicStrategyChart.js"></script>
-<script src="js/game.js"></script>
+
+<!--Custom Angular Scripts to control app-->
+<script src="js/app.js"></script>
+<script src="js/app.routes.js"></script>
+<script src="js/controllers/homeController.js"></script>
+<script src="js/controllers/simController.js"></script>
+<script src="js/services/bjService.js"></script>
 </body>
 </html>

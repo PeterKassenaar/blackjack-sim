@@ -4,7 +4,7 @@
  */
 
 /** Play BLACKJACK! */
-var BlackJack = (function ($) {
+var BlackJack = (function () {
 	/********************/
 	/* initialization & variables */
 	/********************/
@@ -12,7 +12,7 @@ var BlackJack = (function ($) {
 	var numSessions = 30;		 	// TODO: Make numSessions dynamic
 	var numHands = 100;				// TODO: make dynamic
 	var numDecks = 6;
-	var winPercentageGoal = 20; 	// TODO: Make winPercentageGoal dynamic
+	var winPercentageGoal = 40; 	// TODO: Make winPercentageGoal dynamic
 	var playerAmount = 1000; 		// TODO: make playerAmount dynamic
 	var betSize = 50;				// TODO: make betSize dynamic
 
@@ -30,7 +30,7 @@ var BlackJack = (function ($) {
 	var dealerHand;
 
 	/* CACHE SELECTORS!!! */
-	var $autoPlayButton = $('#autoPlay');
+	var $autoPlayButton = document.getElementById('autoPlay');
 
 	/* win/lose ratio and other statistics */
 	var wins = 0;
@@ -54,6 +54,8 @@ var BlackJack = (function ($) {
 	var units = playerAmount / betSize;
 	var handsPlayed = 0;
 	var isSplitted = false;
+	var playerWentBankrupt = false;
+	var goalReached = false;
 
 	/********************/
 	/* Functions below here */
@@ -80,6 +82,7 @@ var BlackJack = (function ($) {
 		currentLosingStreak = 0;
 		maxWinningStreak = 0;
 		maxLosingStreak = 0;
+		playerWentBankrupt = false;
 
 		/* Make sure to shuffle at the start of the game. */
 		deck.shuffle();
@@ -87,9 +90,8 @@ var BlackJack = (function ($) {
 	init();
 
 	/** Reset sessions-array and stats */
-	function resetSessions () {
+	function resetSessions() {
 		sessions = [];
-		numSessions = 30; // TODO read numSessions dynamically
 	}
 
 	/** Check if player or dealer has blackjack (==21 w/ only two cards)
@@ -422,7 +424,7 @@ var BlackJack = (function ($) {
 	/********************/
 
 	/* Auto Play button */
-	$autoPlayButton.on('click', function () {
+	$autoPlayButton.addEventListener('click', function () {
 		console.clear();
 		console.time('session');
 		console.log('session started. Simulating...');
@@ -431,6 +433,10 @@ var BlackJack = (function ($) {
 		// Play Sessions
 		//*********
 		resetSessions();
+		// Play at least one session
+		if (numSessions <= 0) {
+			numSessions = 1;
+		}
 		for (var k = 0; k < numSessions; k++) {
 			console.log('***Currently playing: session #', k);
 			init();
@@ -438,20 +444,36 @@ var BlackJack = (function ($) {
 			// Play Hands
 			//*********
 			for (var i = 0; i < numHands; i++) {
-				// reset hand and trigger new deal
-				// console.info('New hand: # ' + i);
+				// 1. Reset hand and trigger new deal
 				isSplitted = false;
 				hands.push(new Hand(deck, 2, betSize)); // New hand for player, two cards.
 				dealerHand = new Hand(deck, 1); // One card for dealer.
-				//***************************************
-				// check if user must stand or hit. Pick a strategy by (un)commenting.
-				for (var j = 0; j < hands.length; j++) {
 
+				// 2. Check if user must stand or hit. Pick a strategy by (un)commenting.
+				for (var j = 0; j < hands.length; j++) {
 					yourHand = hands[j];
 					//autoPlayWithoutStrategy();
 					autoPlayBasicStrategy();
 				}
 				stand();
+				// 3. Check if winPercentage goal is reached
+				winPercentage = toPercentage((playerAmount - playerStartAmount), playerStartAmount); // round to 1 decimal
+				if (winPercentage >= winPercentageGoal) {
+					goalReached = true;
+					playerWentBankrupt = false;
+					break;
+				}
+				// 4. Check if player went bankrupt
+				else if (playerAmount <= 0) {
+					playerWentBankrupt = true;
+					goalReached = false;
+					break;
+
+				} else {
+					// 5. Move on, nothing to see here.
+					playerWentBankrupt = false;
+					goalReached = false;
+				}
 			}
 			// calculate and log some derived stats
 			winPercentage = toPercentage(wins, numHands); // round to 1 decimal
@@ -478,27 +500,33 @@ var BlackJack = (function ($) {
 			// Store session in object
 			var currentSession = new Session(numHands, playerStartAmount, betSize, wins, losses,
 				playerBlackjacks, dealerBlackjacks, numSplitHands,
-				(playerAmount <= 0), winPercentageGoal, "unclear", handsPlayed,
-				maxWinningStreak,maxLosingStreak,
+				playerWentBankrupt, winPercentageGoal, goalReached, handsPlayed,
+				maxWinningStreak, maxLosingStreak,
 				maxPlayerAmount, minPlayerAmount, playerAmount);
 			// store played session in array
 			sessions.push(currentSession);
+			if (goalReached) {
+				console.log('Goal Reached: ** YES ** , after ', handsPlayed, ' hands played.');
+			}
 		}
-		console.log('Stats from series: ', sessions);
+		console.log('Stats from sessions: ', sessions);
 		// more stats. TODO: make dynamic, pull from console
 		var numBankrupts = 0,
 			numGoalReached = 0;
-		for (var m = 0; m < sessions.length; m++) {
+		for (var m = 0; m < sessions.length; m += 1) {
 			if (sessions[m].bankrupt) {
-				numBankrupts++;
+				numBankrupts += 1;
 			}
-			if (toPercentage((sessions[m].maxPlayerAmount - parseInt(sessions[m].bankroll)), sessions[m].bankroll)
-				> sessions[m].goal) {
-				numGoalReached++
+			//if (toPercentage((sessions[m].maxPlayerAmount - parseInt(sessions[m].bankroll)), sessions[m].bankroll) >= sessions[m].goal) {
+			if (sessions[m].goalReached) {
+				console.log(m, ': Goal: ** YES ** , after ', sessions[m].handsPlayed, ' hands played.');
+				numGoalReached += 1;
+			} else {
+				console.log(m, ': Goal: ** NO ** , played ', sessions[m].handsPlayed, ' hands.');
 			}
 
 		}
 		console.log('Num bankrupts:', numBankrupts, '(', toPercentage(numBankrupts, numSessions), '%)');
 		console.log('Num win percentage goals reached:', numGoalReached, '(', toPercentage(numGoalReached, numSessions), '%)');
 	});
-}(jQuery));
+})();

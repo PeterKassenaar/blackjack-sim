@@ -23,10 +23,11 @@
  * @constructor
  */
 var Session = function (maxNumhands, bankroll, betSize, wins, losses,
-						playerBlackjacks, dealerBlackjacks, splitHands, bankrupt,
+						playerBlackjacks, dealerBlackjacks, splitHands,
+						bankrupt,
 						goal, goalReached, handsPlayed,
 						maxWinningStreak, maxLosingStreak,
-						maxPlayerAmount, minPlayerAmount, endPlayerAmount) {
+						maxPlayerAmount, minPlayerAmount, endPlayerAmount, sessionTimer) {
 	this.maxNumhands = maxNumhands;
 	this.bankroll = bankroll;
 	this.betSize = betSize;
@@ -48,4 +49,5 @@ var Session = function (maxNumhands, bankroll, betSize, wins, losses,
 	this.maxPlayerAmount = maxPlayerAmount;
 	this.minPlayerAmount = minPlayerAmount;
 	this.endPlayerAmount = endPlayerAmount;
+	this.sessionTimer = sessionTimer;
 };

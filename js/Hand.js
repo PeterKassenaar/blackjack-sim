@@ -51,6 +51,36 @@ var Hand = function (deck, numCards, value, splitHandCard) {
 		return false;
 	};
 
+	/** Check if player or dealer has blackjack (==21 w/ only two cards)
+	 * @Returns {bool} true if the hand is a blackjack, false if not.
+	 */
+	this.isBlackjack = function () {
+		return (cards.length === 2) && (this.score() === 21);
+	};
+
+	/** Double down only allowed on first two cards
+	 * @returns {bool} true if doubling down is allowed
+	 * */
+	this.canDouble = function () {
+		return cards.length === 2;
+	};
+
+
+	/** Check if the hand has a pair (2,2, 3,3, 4,4 etc.).
+	 * @returns {bool} true is the hand is a pair, false if not
+	 */
+	this.isPair = function () {
+		if (cards.length !== 2) {
+			return false;
+		} else {
+			//var currentHand = hand.getHand();
+			if (cards[0].getValue() === cards[1].getValue()) {
+				return true;
+			}
+		}
+		return false;
+	};
+
 	/** Check if this hand is considered a soft hand (i.e. it contains an
 	 * ace that is counted as 11.
 	 * @returns {boolean} true if hand is soft hand. False if not.
@@ -70,7 +100,7 @@ var Hand = function (deck, numCards, value, splitHandCard) {
 		}
 		/* if there is one (or more) ace, and the score is
 		 * still below 21, it is a soft hand */
-		return (score < 21 && aces > 0) ;
+		return (score < 21 && aces > 0);
 	};
 
 	/** Getter and setter for size of bet for this hand
