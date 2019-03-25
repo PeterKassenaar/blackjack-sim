@@ -1,7 +1,12 @@
 /**
  * Created by Peter Kassenaar on 14-4-2015.
  */
-/** @constructor */
+/** @constructor
+ * @param {Deck} deck - The deck from which the cards are dealt.
+ * @param {number} numCards - the number of cards that are dealt. Two for the player, one for the dealer.
+ * @param {number} value - the value (i.e. betting size) for this hand.
+ * @param {boolean} splitHandCard - true if this new hand is based on a previous splitted hand.
+ * */
 var Hand = function (deck, numCards, value, splitHandCard) {
 	var cards = [];
 	var betSize = value ? value : 0;

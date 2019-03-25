@@ -1,48 +1,58 @@
-.red{
-	background-color: red;
+.red {
+	background-color : red;
 }
-.blue{
-	background-color: blue;
+
+.blue {
+	background-color : blue;
 }
-.green{
-	background-color: green;
+
+.green {
+	background-color : green;
 }
-.pink{
-	background-color: pink;
+
+.pink {
+	background-color : pink;
 }
-.silver{
-	background-color: silver;
+
+.silver {
+	background-color : silver;
+}
+
+/* for ui.bootstrap, see https://angular-ui.github.io/bootstrap/#/getting_started */
+.nav, .pagination, .carousel, .panel-title a {
+	cursor : pointer;
 }
 
 /**********************
 	Animations
 *******************/
 .animate {
-    /*-moz-transition: color 0.6s, background-color 0.3s;
-    -o-transition: color 0.6s, background-color 0.3s;
-    -webkit-transition: color 0.6s, background-color 0.3s;
-    transition: color 0.6s, background-color 0.3s;*/
+	/*-moz-transition: color 0.6s, background-color 0.3s;
+	-o-transition: color 0.6s, background-color 0.3s;
+	-webkit-transition: color 0.6s, background-color 0.3s;
+	transition: color 0.6s, background-color 0.3s;*/
 }
+
 .animate.ng-enter {
-    -moz-animation: fadeInRight 1s;
-    -o-animation: fadeInRight 1s;
-    -webkit-animation: fadeInRight 1s;
-    animation: fadeInRight 1s;
+	-moz-animation    : fadeInRight 1s;
+	-o-animation      : fadeInRight 1s;
+	-webkit-animation : fadeInRight 1s;
+	animation         : fadeInRight 1s;
 }
 
 .animate.ng-leave {
-    -moz-animation: fadeOutRight 0.5s;
-    -o-animation: fadeOutRight 0.5s;
-    -webkit-animation: fadeOutRight 0.5s;
-    animation: fadeOutRight 0.5s;
+	/*-moz-animation    : fadeOutRight 0.5s;*/
+	/*-o-animation      : fadeOutRight 0.5s;*/
+	/*-webkit-animation : fadeOutRight 0.5s;*/
+	/*animation         : fadeOutRight 0.5s;*/
 }
 
-/*body {*/
-/*font-family: Roboto sans-serif;*/
-/*padding: 1em;*/
-/*}*/
-/*
-#yourHand {
+body {
+	/*padding-top : 75px;*/
+}
+
+
+#yourHand, #splitHand {
     overflow: hidden;
     position: relative;
     border: 1px solid #056B42;
@@ -53,8 +63,8 @@
     color: #69D1A7;
     padding: .5em;
     font-size: 1.1em;
-    height: 6em;
-    width: 25em;
+    /*height: 6em;*/
+    /*width: 25em;*/
 }
 
 .card {
@@ -68,10 +78,10 @@
     box-shadow: 0 2px 2px 1px #999;
     font-size: 20pt;
     float: left;
-    width: 3.75em;
-    height: 5em;
+    width: 2.75em;
+    height: 4em;
     padding: .1em;
-    margin-right: -1em;
+    margin-right: -0.75em;
     font-family: serif;
 }
 
@@ -194,4 +204,3 @@
 #losses {
     color: #F16D17;
 }
-*/

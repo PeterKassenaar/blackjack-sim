@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html ng-app="myApp">
+<head lang="en">
+    <meta charset="UTF-8">
+    <!--Credits: http://codepen.io/hoangtx/pen/tnmev-->
+    <title>Poker/blackjack chip directive in AngularJS</title>
+    <style>
+
+        body {
+            font-family : Calibri, "Open Sans", sans-serif;
+            font-size   : 14px;
+        }
+
+        .circ-button, .bj-chip {
+            display         : inline-block;
+            width           : 5em;
+            height          : 5em;
+            font-size       : 1.5em;
+            font-weight     : 700;
+            letter-spacing  : .1em;
+            text-transform  : uppercase;
+            text-align      : center;
+            text-decoration : none;
+            color           : #fff;
+            border          : 10px dashed #fff;
+            border-radius   : 50%;
+            padding-top     : 1.5em; /*6em/2 - 1em;*/
+            transition      : all linear 0.15s;
+            box-shadow      : 0 0 20px rgba(0, 0, 0, 0.5);
+            margin          : 1.5em auto;
+            box-sizing      : border-box;
+            cursor          : pointer;
+        }
+
+        .circ-button:hover,
+        .bj-chip:hover {
+            background   : darkgreen; /* darken(invert(green), 25%); */
+            border-color : black; /* invert(#fff); */
+            color        : black; /* invert(#fff); */
+        }
+
+        .value-5 {
+            background : silver;
+        }
+
+        .value-10 {
+            background : green;
+        }
+
+        .value-20 {
+            background : red;
+        }
+
+        .value-50 {
+            background : darkblue;
+        }
+
+        .value-100 {
+            background : black;
+        }
+
+        #newChips {
+            border  : 1px solid black;
+            padding : 10px;
+        }
+    </style>
+</head>
+<body ng-controller="appController as appCtrl">
+<div bj-chip chip-value="5" clone-target="newChips"></div>
+<div bj-chip chip-value="10" clone-target="newChips"></div>
+<div bj-chip chip-value="20" clone-target="newChips"></div>
+<div>
+    <button ng-click="appCtrl.clear()">Clear</button>
+</div>
+<div id="newChips"></div>
+
+<script src="js/vendor/angular/angular.min.js"></script>
+<script>
+    (function () {
+        'use strict';
+        angular.module('myApp', ['bjChips'])
+                .controller('appController', appController);
+
+        function appController() {
+            var vm   = this;
+            vm.clear = function () {
+                var myEl = angular.element(document.querySelector('#newChips'))
+                myEl.empty();
+            }
+        }
+
+        //*************
+
+        angular.module('bjChips', [])
+                .directive('bjChip', bjChip);
+
+        function bjChip() {
+            // Directive DDO
+            return {
+                replace          : true,
+                restrict         : 'AE',
+                template         : '<a class="bj-chip" ng-click="vm.clone()">{{vm.chipValue}}</a>',
+                scope            : {
+                    chipValue   : '@',
+                    cloneTarget : '@'
+                },
+                link             : link,
+                controller       : controller,
+                controllerAs     : 'vm',
+                bindToController : true
+            };
+
+            // Link function
+            function link(scope, el, attrs) {
+                // Decide which chip value to show
+                if (attrs.chipValue) {
+                    el.addClass('value-' + attrs.chipValue);
+                } else {
+                    el.addClass('value-5'); // default
+                }
+            }
+
+            // Controller function
+            function controller($element) {
+                var vm = this;
+                // Default value, if not provided in HTML
+                if (!vm.chipValue) {
+                    vm.chipValue = 5;
+                }
+
+                vm.clone = function () {
+                    // clone only if target provided.
+                    if (vm.cloneTarget) {
+                        var newChip                     = $element.clone();
+                        newChip[0].style['margin-left'] = '-35px';
+                        angular.element(document.querySelector('#' + vm.cloneTarget))
+                                .append(newChip);
+                    }
+                }
+
+            }
+        }
+    })();
+</script>
+</body>
+</html>

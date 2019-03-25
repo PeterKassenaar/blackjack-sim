@@ -1,0 +1,80 @@
+<div class="container-fluid">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <h1>Details : {{ vm.sessions.length}} sessions</h1>
+        </div>
+    </nav>
+    <div class="row" style="padding-top: 75px;">
+        <accordion close-others="true">
+            <accordion-group ng-repeat="session in vm.sessions">
+                <accordion-heading>
+                    <p ng-class="{ 'bg-success': session.goalReached, 'bg-danger': !session.goalReached}">
+                        Session #{{$index + 1}}</p>
+                </accordion-heading>
+                <table class="table table-striped">
+                    <tr>
+                        <td>Max # of hands</td>
+                        <td>{{session.maxNumhands}}</td>
+                    </tr>
+                    <tr>
+                        <td>Played # of hands</td>
+                        <td>{{session.handsPlayed}}</td>
+                    </tr>
+                    <tr>
+                        <td>Bankroll</td>
+                        <td>{{session.bankroll}}</td>
+                    </tr>
+                    <tr>
+                        <td>Size of bet</td>
+                        <td>{{session.betSize}} ({{session.units}} units)</td>
+                    </tr>
+                    <tr>
+                        <td>Win/lose</td>
+                        <td>{{session.wins}}/{{session.losses}}</td>
+                    </tr>
+                    <tr>
+                        <td>Win/lose %</td>
+                        <td>{{session.winPercentage}}/{{session.losePercentage}}</td>
+                    </tr>
+                    <tr>
+                        <td>Went Bankrupt?</td>
+                        <td>{{ session.bankrupt}}</td>
+                    </tr>
+                    <tr>
+                        <td>Player # blackjacks</td>
+                        <td>{{session.playerBlackjacks}}</td>
+                    </tr>
+                    <tr>
+                        <td>Dealer # blackjacks</td>
+                        <td>{{ session.dealerBlackjacks}}</td>
+                    </tr>
+                    <tr>
+                        <td>Splitted hands</td>
+                        <td>{{session.splitHands}} ({{session.splitHandPercentage}}%)</td>
+                    </tr>
+                    <tr>
+                        <td>Max. winning streak</td>
+                        <td>{{session.maxWinningStreak}} hands in a row</td>
+                    </tr>
+                    <tr>
+                        <td>Max. losing streak</td>
+                        <td>{{session.maxLosingStreak}} hands in a row</td>
+                    </tr>
+                    <tr>
+                        <td>Maximum Amount/end amount</td>
+                        <td>{{session.maxPlayerAmount}} / {{session.endPlayerAmount}}</td>
+                    </tr>
+                    <tr>
+                        <td>Minimum player amount</td>
+                        <td>{{session.minPlayerAmount}}</td>
+                    </tr>
+                    <tr>
+                        <td>Simulation time ({{session.handsPlayed}} hands)</td>
+                        <td>{{session.sessionTimer}} ms.</td>
+                    </tr>
+                </table>
+                <h3>goal reached: {{session.goalReached}}, after {{session.handsPlayed}} hands played</h3>
+            </accordion-group>
+        </accordion>
+    </div>
+</div>

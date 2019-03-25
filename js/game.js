@@ -3,7 +3,9 @@
  * @author Scott Carroll (original: https://github.com/scottux/BlackJack)
  */
 
-/** Play BLACKJACK! */
+/* --------- */
+/***** CURRENTLY NOT IN USE ANYMORE! FUNCTIONALITY AVAILABLE ON CONTROLLERS & SERVICES  ******/
+/* --------- */
 var BlackJack = (function () {
 	/********************/
 	/* initialization & variables */

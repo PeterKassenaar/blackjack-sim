@@ -1,103 +1,99 @@
-<md-content layout-padding>
-    <md-progress-circular md-mode="indeterminate" md-diameter="100"
-                          ng-show="vm.showLoader"></md-progress-circular>
-    <!-- Bet size -->
-    <div layout>
-        <div flex="20" layout layout-align="center center">
-            <span class="md-body-1">Bet size</span>
+<div class="container-fluid">
+    <nav class="navbar navbar-default navbar-fixed-top">
+        <div class="container">
+            <h1>Simulate</h1>
         </div>
-        <md-slider md-discrete step="25" flex min="5" max="500" ng-model="vm.betSize" ng-change="vm.updateUnits()"
-                   aria-label="bet size" id="slider-betsize">
-        </md-slider>
-        <div flex="20" layout layout-align="center center">
-            <input type="number" ng-model="vm.betSize" ng-change="vm.updateUnits()" aria-label="betsize"
-                   aria-controls="slider-betsize">
+    </nav>
+
+
+    <div class="form-horizontal" style="padding-top: 75px;">
+        <!-- Bet size -->
+        <div class="form-group">
+            <label for="numBetSize" class="col-xs-4 control-label">Bet size</label>
+
+            <div class="col-xs-8">
+                <input type="number" class="form-control" id="numBetSize"
+                       ng-model="vm.betSize" ng-change="vm.updateUnits()"/>
+            </div>
         </div>
+        <!--Bankroll / player amount-->
+        <div class="form-group">
+            <label for="numBankroll" class="col-xs-4 control-label">Bankroll</label>
+
+            <div class="col-xs-8">
+                <input type="number" class="form-control" id="numBankroll"
+                       ng-model="vm.playerStartAmount" ng-change="vm.updateUnits()"/>
+            </div>
+        </div>
+        <!--Calculated # of Units-->
+        <div class="form-group">
+            <div class="col-xs-4 control-label">
+                <h3>Units:</h3></div>
+
+            <div class="col-xs-8">
+                <h3>{{ vm.units}}</h3>
+            </div>
+        </div>
+        <!--Num hands-->
+        <div class="form-group">
+            <label for="numNumHands" class="col-xs-4 control-label">Hands per session</label>
+
+            <div class="col-xs-8">
+                <input type="number" class="form-control" id="numNumHands"
+                       ng-model="vm.numHands"/>
+            </div>
+        </div>
+
+        <!--Num sessions-->
+        <div class="form-group">
+            <label for="numNumSessions" class="col-xs-4 control-label">Num sessions</label>
+
+            <div class="col-xs-8">
+                <input type="number" class="form-control" id="numNumSessions"
+                       ng-model="vm.numSessions" ng-change="vm.changeNumSessions()"/>
+            </div>
+        </div>
+
+        <!--Win percentage goal-->
+        <div class="form-group">
+            <label for="numWinPercentageGoal" class="col-xs-4 control-label">GOAL: Win (%)</label>
+
+            <div class="col-xs-8">
+                <input type="number" class="form-control" id="numWinPercentageGoal"
+                       ng-model="vm.winPercentageGoal" ng-change="vm.changePercentage()"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="btnSimulate" class="col-xs-4 control-label"></label>
+
+            <div class="col-xs-8">
+                <!--Button to start simulation-->
+                <a ng-click="vm.startSimulate()" class="btn btn-block btn-success" id="btnSimulate">Simulate!</a>
+                <div style="height: 50px; line-height: 50px; text-align: center; color:#333; background-color: #8ec2bf; border: 1px solid brown"
+                     ng-show="vm.showSpinner">
+                    <p>Calculating, playing {{vm.numTotalHands}} hands of blackjack...</p>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <!--Bankroll / player amount-->
-    <div layout>
-        <div flex="20" layout layout-align="center center">
-            <span class="md-body-1">Bankroll</span>
-        </div>
-        <md-slider md-discrete step="100" flex min="500" max="2000" ng-model="vm.playerStartAmount"
-                   ng-change="vm.updateUnits()" aria-label="Bankroll" id="slider-bankroll">
-        </md-slider>
-        <div flex="20" layout layout-align="center center">
-            <input type="number" ng-model="vm.playerStartAmount" ng-change="vm.updateUnits()" aria-label="Bankroll"
-                   aria-controls="slider-bankroll">
-        </div>
-    </div>
-    <!--Calculated # of Units-->
-    <div layout>
-        <div flex layout layout-align="center center">
-            <h1>units: {{ vm.units}}</h1>
-        </div>
-    </div>
-    <!--Num hands-->
-    <div layout>
-        <div flex="20" layout layout-align="center center">
-            <span class="md-body-1">Hands per session</span>
-        </div>
-        <md-slider md-discrete step="10" flex min="50" max="500" ng-model="vm.numHands" aria-label="Num hands"
-                   id="slider-handsPlayed">
-        </md-slider>
-        <div flex="20" layout layout-align="center center">
-            <input type="number" ng-model="vm.numHands" aria-label="Num hands" aria-controls="slider-handsPlayed">
-        </div>
-    </div>
-    <!--Num sessions-->
-    <div layout>
-        <div flex="20" layout layout-align="center center">
-            <span class="md-body-1">Num Sessions</span>
-        </div>
-        <md-slider md-discrete step="10" flex min="1" max="100" ng-model="vm.numSessions" aria-label="Num sessions"
-                   id="slider-numSessions">
-        </md-slider>
-        <div flex="20" layout layout-align="center center">
-            <input type="number" ng-model="vm.numSessions" aria-label="Num sessions" aria-controls="slider-numSessions">
-        </div>
-    </div>
-    <!--Win percentage goal-->
-    <div layout>
-        <div flex="20" layout layout-align="center center">
-            <span class="md-body-1">Win Goal (%):</span>
-        </div>
-        <md-slider flex min="0" max="100" ng-model="vm.winPercentageGoal" aria-label="Win Percentage Goal"
-                   id="slider-winPercentageGoal">
-        </md-slider>
-        <div flex="20" layout layout-align="center center">
-            <input type="number" ng-model="vm.winPercentageGoal" aria-label="Win Percentage Goal"
-                   aria-controls="slider-winPercentageGoal">
-        </div>
-    </div>
-    <!--Button to start simulation-->
-    <div layout layout-align="center center">
-        <md-button ng-click="vm.simulate()" class="md-raised md-warn">Simulate!</md-button>
-    </div>
+    <!--/Container met instellingen -->
+
+    <!-- Container-div showing the results -->
     <div id="results" ng-show="vm.resultsReady" class="animate">
-        <h3>Goals Reached: {{ vm.results.goalsReached.numGoalsReached}} out of
+        <h3>Goals Reached: {{ vm.numGoalsReached}} out of
             {{vm.numSessions}} sessions
-            ({{vm.results.goalsReached.numGoalsReachedPercentage}}%)!
+            ({{vm.numGoalsReachedPercentage}}%)!
         </h3>
 
-        <h3>Times bankrupt: {{ vm.results.bankrupts.numBankrupts}} out of
+        <h3>Times bankrupt: {{ vm.numBankrupts}} out of
             {{vm.numSessions}} sessions
-            ({{vm.results.bankrupts.bankruptPercentage}}%).</h3>
-        <!--<p>Details:</p>-->
-        <!--<hr />-->
-        <!--<md-list>-->
-        <!--<md-list-item class="md-3-line" ng-repeat="session in vm.results.sessionResults">-->
-        <!--<div class="md-list-item-text">-->
-        <!--<h3>Goal Reached: {{session.goalReached}}</h3>-->
-        <!--<p>winPercentage:{{session.winPercentage}}</p>-->
-        <!--<p>Win/Lose:{{session.wins}}/{{session.losses}}</p>-->
-        <!--</div>-->
-        <!--</md-list-item>-->
-        <!--</md-list>-->
+            ({{vm.bankruptPercentage}}%).</h3>
 
+        <div>
+            <a ng-click="vm.clear()" class="btn btn-lg btn-default">Clear</a>
+            <a href="#/details" class="btn btn-lg btn-primary">Details</a>
+        </div>
     </div>
-    <div style="height: 200px; overflow: scroll; border: 1px solid #888;">
-        <div ng-bind-html-unsafe="vm.resultMsg"></div>
-    </div>
-
-</md-content>
+</div>
